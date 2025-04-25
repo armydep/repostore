@@ -1,0 +1,23 @@
+# Bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+.venv/
+venv/
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+
+# MacOS
+.DS_Store
+
+# Logs
+*.log
+
+# Env files
+.env
+ 
