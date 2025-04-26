@@ -1,5 +1,11 @@
 
 
+1. setup project:
+  python3 -m venv .venv
+  source .venv/bin/activate
+  uvicorn app.main:app --reload --port 8080
+  pip install -r requirements.txt
+  uvicorn app.main:app --reload --port 8080  
 1. maven settings
 path: .m2/settings.xml
 '''
