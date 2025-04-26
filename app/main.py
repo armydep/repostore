@@ -66,7 +66,7 @@ async def handle_mypath(full_path: str, request: Request):
                     print(f"Header from Maven for jar: {header} = {value}")
                 response_headers = {   
                     k: v for k, v in response.headers.items()
-                    if k.lower() != "content-length" and not k.lower().startswith("x-")
+                    if k.lower() != "content-length" 
                 }                
                 
                 content_bytes = response.content
