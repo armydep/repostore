@@ -1,11 +1,12 @@
-# app/services/cache_service.py
-
 from typing import Optional, Tuple
 from fastapi import Response
 import threading
 import os
 
 from app.core.config import settings
+import logging
+
+logger = logging.getLogger("cache_service")
 
 class CacheService:
     _storagerootpath: str = settings.storage_path
