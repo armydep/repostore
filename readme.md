@@ -72,3 +72,17 @@
   ```bash
   mitmweb --mode reverse:https://repo.maven.apache.org --listen-host 127.0.0.1 --listen-port 8000
   ```
+
+6. **Maven**
+  - resolve 
+  ```bash 
+  mvn dependency:resolve
+  ```
+  - package
+  ```bash
+  mvn package
+  ```
+  - install
+  ```bash
+  mvn install
+  ```

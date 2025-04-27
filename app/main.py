@@ -14,28 +14,19 @@ def read_root():
 def handle_mypath_root():
     return {"info": "You called /mypath without extra path."}
 
-#@app.get("/maven2/{full_path:path}")
 @app.api_route("/maven2/{full_path:path}", methods=["GET", "HEAD"])
-#async 
 def handle_mypath(full_path: str, request: Request):
     url = f"https://repo.maven.apache.org/maven2/{full_path}"                
     print(f"Request_IN from client: {full_path}. {request.method}. fwd url: {url}")
     for header, value in request.headers.items():
         print(f"IN_Header: {header} = {value}")
-    #forwarded_headers = {
-    #                k: v for k, v in request.headers.items() if k.lower() != "host"
-    #            }
-    forwarded_headers = dict(request.headers)
+    #forwarded_headers = dict(request.headers)
     try:
         if full_path.endswith(".pom"):
-            #async with httpx.AsyncClient() as client:                
             with httpx.Client() as client:
-                #response = await client.get(url, headers = forwarded_headers)
-                response = client.get(url, headers = forwarded_headers)
+                response = client.get(url)#, headers = forwarded_headers)
                 for header, value in response.headers.items():
                     print(f"Header from Maven: {header} = {value}")
-                etagHeader = response.headers.get("etag", "")                    
-                contentLegthHeader = response.headers.get("content-length", "")  
 
                 response_headers = {   
                     k: v for k, v in response.headers.items()
@@ -46,8 +37,8 @@ def handle_mypath(full_path: str, request: Request):
                 md5_checksum = hashlib.md5(content_bytes).hexdigest()
                 sha1_checksum = hashlib.sha1(content_bytes).hexdigest()
 
-                response_headers["x-checksum-md5"] = md5_checksum
-                response_headers["x-checksum-sha1"] = sha1_checksum
+                #response_headers["x-checksum-md5"] = md5_checksum
+                #response_headers["x-checksum-sha1"] = sha1_checksum
 
                 for header, value in response_headers.items():
                     print(f"Header *response* for pom: {header} = {value}")
@@ -56,14 +47,10 @@ def handle_mypath(full_path: str, request: Request):
                     return Response(content=b"", headers=response_headers)
                 return Response(content=response.text, media_type="text/xml", headers=response_headers) #dict(response.headers))
         elif full_path.endswith(".xml"):
-            #async with httpx.AsyncClient() as client:
             with httpx.Client() as client:
-                #response = await client.get(url, headers = forwarded_headers)
-                response = client.get(url, headers = forwarded_headers)
+                response = client.get(url) #, headers = forwarded_headers)
                 for header, value in response.headers.items():
                     print(f"Header from Maven: {header} = {value}")
-                etagHeader = response.headers.get("etag", "")                    
-                contentLegthHeader = response.headers.get("content-length", "")    
                 response_headers = {   
                     k: v for k, v in response.headers.items()
                     if k.lower() != "content-length"
@@ -72,10 +59,8 @@ def handle_mypath(full_path: str, request: Request):
                     return Response(content=b"", headers=response_headers)                
                 return Response(content=response.text, media_type="text/xml", headers=response_headers) 
         elif full_path.endswith(".sha1"):
-            #async with httpx.AsyncClient() as client:
             with httpx.Client() as client:
-                #response = await client.get(url, headers = forwarded_headers)
-                response = client.get(url, headers = forwarded_headers)
+                response = client.get(url)#, headers = forwarded_headers)
                 for header, value in response.headers.items():
                     print(f"Header from Maven for sha1: {header} = {value}")
                 response_headers = {   
@@ -84,10 +69,8 @@ def handle_mypath(full_path: str, request: Request):
                 }
                 return Response(content=response.text, media_type="text/plain", headers=response_headers) 
         elif full_path.endswith(".jar"): 
-            #async with httpx.AsyncClient() as client:
             with httpx.Client() as client:
-                #response = await client.get(url, headers = forwarded_headers)
-                response = client.get(url, headers = forwarded_headers)
+                response = client.get(url)#, headers = forwarded_headers)
                 for header, value in response.headers.items():
                     print(f"Header from Maven for jar: {header} = {value}")
                 response_headers = {   
@@ -95,12 +78,12 @@ def handle_mypath(full_path: str, request: Request):
                     if k.lower() != "content-length" 
                 }                
                 
-                content_bytes = response.content
-                md5_checksum = hashlib.md5(content_bytes).hexdigest()
-                sha1_checksum = hashlib.sha1(content_bytes).hexdigest()
+                #content_bytes = response.content
+                #md5_checksum = hashlib.md5(content_bytes).hexdigest()
+                #sha1_checksum = hashlib.sha1(content_bytes).hexdigest()
 
-                response_headers["x-checksum-md5"] = md5_checksum
-                response_headers["x-checksum-sha1"] = sha1_checksum
+                #response_headers["x-checksum-md5"] = md5_checksum
+                #response_headers["x-checksum-sha1"] = sha1_checksum
             
                 for header, value in response_headers.items():
                     print(f"Header ***response*** for jar: {header} = {value}")
