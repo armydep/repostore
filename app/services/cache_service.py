@@ -18,7 +18,6 @@ class CacheService:
 
     @classmethod
     def getResource(cls, groupId: str, artifactId: str, version: str, name: str) -> Optional[Response]:
-        return None
         file_path = cls._build_file_path(groupId, artifactId, version, name)
         if os.path.isfile(file_path):
             with cls._lock:
@@ -32,8 +31,7 @@ class CacheService:
         return None
 
     @classmethod
-    def put(cls, groupId: str, artifactId: str, version: str, name: str, resource: Response) -> None:
-        return
+    def put(cls, groupId: str, artifactId: str, version: str, name: str, resource: Response) -> None:        
         file_path = cls._build_file_path(groupId, artifactId, version, name)
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with cls._lock:
