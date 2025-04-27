@@ -1,102 +1,51 @@
 from fastapi import FastAPI, Request, Response
+from contextlib import asynccontextmanager
 from fastapi.responses import JSONResponse
 from typing import Optional
 import httpx
 import hashlib
 
-app = FastAPI()
+from app.config import settings
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print(f"🚀 Starting app with URL: {settings.url}")
+    yield
+    print("🛑 App shutting down.")
+
+
+app = FastAPI(lifespan=lifespan)
+
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to myproj 🚀"}
+    return {"message": "Welcome to RepoStore 🚀"}
 
-@app.get("/mypath")
-def handle_mypath_root():
-    return {"info": "You called /mypath without extra path."}
 
 @app.api_route("/maven2/{full_path:path}", methods=["GET", "HEAD"])
 def handle_mypath(full_path: str, request: Request):
-    url = f"https://repo.maven.apache.org/maven2/{full_path}"                
+    url = f"{settings.url}/{full_path}"
     print(f"Request_IN from client: {full_path}. {request.method}. fwd url: {url}")
-    for header, value in request.headers.items():
-        print(f"IN_Header: {header} = {value}")
-    #forwarded_headers = dict(request.headers)
     try:
-        if full_path.endswith(".pom"):
-            with httpx.Client() as client:
-                response = client.get(url)#, headers = forwarded_headers)
-                for header, value in response.headers.items():
-                    print(f"Header from Maven: {header} = {value}")
-
-                response_headers = {   
-                    k: v for k, v in response.headers.items()
-                    if k.lower() != "content-length"
-                }
-                
-                content_bytes = response.content
-                md5_checksum = hashlib.md5(content_bytes).hexdigest()
-                sha1_checksum = hashlib.sha1(content_bytes).hexdigest()
-
-                #response_headers["x-checksum-md5"] = md5_checksum
-                #response_headers["x-checksum-sha1"] = sha1_checksum
-
-                for header, value in response_headers.items():
-                    print(f"Header *response* for pom: {header} = {value}")
-
-                if request.method == "HEAD":
-                    return Response(content=b"", headers=response_headers)
-                return Response(content=response.text, media_type="text/xml", headers=response_headers) #dict(response.headers))
-        elif full_path.endswith(".xml"):
-            with httpx.Client() as client:
-                response = client.get(url) #, headers = forwarded_headers)
-                for header, value in response.headers.items():
-                    print(f"Header from Maven: {header} = {value}")
-                response_headers = {   
-                    k: v for k, v in response.headers.items()
-                    if k.lower() != "content-length"
-                }                
-                if request.method == "HEAD":
-                    return Response(content=b"", headers=response_headers)                
-                return Response(content=response.text, media_type="text/xml", headers=response_headers) 
-        elif full_path.endswith(".sha1"):
-            with httpx.Client() as client:
-                response = client.get(url)#, headers = forwarded_headers)
-                for header, value in response.headers.items():
-                    print(f"Header from Maven for sha1: {header} = {value}")
-                response_headers = {   
-                    k: v for k, v in response.headers.items()
-                    if k.lower() != "content-length"
-                }
-                return Response(content=response.text, media_type="text/plain", headers=response_headers) 
-        elif full_path.endswith(".jar"): 
-            with httpx.Client() as client:
-                response = client.get(url)#, headers = forwarded_headers)
-                for header, value in response.headers.items():
-                    print(f"Header from Maven for jar: {header} = {value}")
-                response_headers = {   
-                    k: v for k, v in response.headers.items()
-                    if k.lower() != "content-length" 
-                }                
-                
-                #content_bytes = response.content
-                #md5_checksum = hashlib.md5(content_bytes).hexdigest()
-                #sha1_checksum = hashlib.sha1(content_bytes).hexdigest()
-
-                #response_headers["x-checksum-md5"] = md5_checksum
-                #response_headers["x-checksum-sha1"] = sha1_checksum
-            
-                for header, value in response_headers.items():
-                    print(f"Header ***response*** for jar: {header} = {value}")
-                if request.method == "HEAD":
-                    return Response(content=b"", headers=response_headers)                    
-                return Response(content=response.content, media_type="application/java-archive", headers=response_headers) 
+        with httpx.Client() as client:
+            response = client.get(url)
+            if request.method == "HEAD":
+                return Response(content=b"", headers=dict(response.headers))                
+            response_body = response.text
+            if response.headers.get("Content-Type", "") == "application/java-archive":
+                response_body = response.content
+            return Response(content=response_body, headers=dict(response.headers))
     except httpx.RequestError as exc:
         print(f"An error occurred while requesting {exc.request.url!r}: {str(exc)}")
-        return JSONResponse(status_code=502, content={"error": "Failed to fetch from url1", "details": str(exc)})
-            
-    print("Unknown request type. {full_path}. {request.method}")            
+        return JSONResponse(
+            status_code=502,
+            content={"error": "Failed to fetch from url1", "details": str(exc)},
+        )
+
+    print("Unknown request type. {full_path}. {request.method}")
     return {
         "requested_subpath": full_path,
         "method": request.method,
-        "info": "Request unsupported"
+        "info": "Request unsupported",
     }
