@@ -86,3 +86,38 @@
   ```bash
   mvn install
   ```
+
+7. **Test**  
+  - pom.xml
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.example</groupId>
+    <artifactId>JServer</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.10.0</version>
+        </dependency>
+    </dependencies>
+</project>
+```
+  - run
+```bash
+rm -rf ~/.m2/repository/org/apache/logging/log4j/log4j-core/2.10.0
+mvn dependency:resolve
+```
+  - compare
+ ```bash
+  curl http://localhost:8000/maven2/org/apache/logging/log4j/log4j-core/2.10.0/log4j-core-2.10.0.pom
+  curl -I http://localhost:8000/maven2/org/apache/logging/log4j/log4j-core/2.10.0/log4j-core-2.10.0.pom
+  curl -I https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/2.10.0/log4j-core-2.10.0.pom
+  curl -I http://localhost:8000/maven2/org/apache/logging/log4j/log4j-core/2.10.0/log4j-core-2.10.0.pom -o remote.txt
+  curl -I https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/2.10.0/log4j-core-2.10.0.pom -o remote.txt
+  sdiff <(sort local.txt) <(sort remote.txt)
+```
