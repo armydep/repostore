@@ -36,10 +36,22 @@ def handle_mypath(full_path: str, request: Request):
                     print(f"Header from Maven: {header} = {value}")
                 etagHeader = response.headers.get("etag", "")                    
                 contentLegthHeader = response.headers.get("content-length", "")  
+
                 response_headers = {   
                     k: v for k, v in response.headers.items()
                     if k.lower() != "content-length"
                 }
+                
+                content_bytes = response.content
+                md5_checksum = hashlib.md5(content_bytes).hexdigest()
+                sha1_checksum = hashlib.sha1(content_bytes).hexdigest()
+
+                response_headers["x-checksum-md5"] = md5_checksum
+                response_headers["x-checksum-sha1"] = sha1_checksum
+
+                for header, value in response_headers.items():
+                    print(f"Header *response* for pom: {header} = {value}")
+
                 if request.method == "HEAD":
                     return Response(content=b"", headers=response_headers)
                 return Response(content=response.text, media_type="text/xml", headers=response_headers) #dict(response.headers))
