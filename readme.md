@@ -121,3 +121,5 @@ mvn dependency:resolve
   curl -I https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/2.10.0/log4j-core-2.10.0.pom -o remote.txt
   sdiff <(sort local.txt) <(sort remote.txt)
 ```
+8. **Generate package**
+9. **Deploy package**
