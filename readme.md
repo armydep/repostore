@@ -122,4 +122,29 @@ mvn dependency:resolve
   sdiff <(sort local.txt) <(sort remote.txt)
 ```
 8. **Generate package**
+  - generate
+  ```bash
+  mvn archetype:generate -DgroupId=com.test.dummy -DartifactId=dummy-artifact -Dversion=1.0.3 -Dpackage=com.test.dummy -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+  ```
+  - update pom. add
+  ```xml
+<properties>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+  </properties>
+  <distributionManagement>
+    <repository>
+        <id>my-repo</id>
+	<url>http://localhost:8000/maven2/</url>
+    </repository>
+  </distributionManagement>
+  ```
+  - package. 
+  ```bash
+  cd <package dir>
+  mvn package
+  ```
 9. **Deploy package**
+```bash
+mvn deploy
+```
