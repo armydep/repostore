@@ -13,12 +13,12 @@ class CacheService:
     _lock = threading.Lock()
 
     @classmethod
-    def _build_file_path(cls, groupId: str, artifactId: str, version: str, name: str) -> str:
-        return os.path.join(cls._storagerootpath, groupId.replace('.', '/'), artifactId, version, name)
+    def _build_file_path(cls, repoName: str, groupId: str, artifactId: str, version: str, name: str) -> str:
+        return os.path.join(cls._storagerootpath, repoName, groupId.replace('.', '/'), artifactId, version, name)
 
     @classmethod
-    def getResource(cls, groupId: str, artifactId: str, version: str, name: str) -> Optional[Response]:
-        file_path = cls._build_file_path(groupId, artifactId, version, name)
+    def getResource(cls, repoName: str, groupId: str, artifactId: str, version: str, name: str) -> Optional[Response]:
+        file_path = cls._build_file_path(repoName, groupId, artifactId, version, name)
         if os.path.isfile(file_path):
             with cls._lock:
                 with open(file_path, "rb") as f:
@@ -31,8 +31,8 @@ class CacheService:
         return None
 
     @classmethod
-    def put(cls, groupId: str, artifactId: str, version: str, name: str, resource: Response) -> None:        
-        file_path = cls._build_file_path(groupId, artifactId, version, name)
+    def put(cls, repoName: str, groupId: str, artifactId: str, version: str, name: str, resource: Response) -> None:        
+        file_path = cls._build_file_path(repoName, groupId, artifactId, version, name)
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with cls._lock:
             with open(file_path, "wb") as f:
