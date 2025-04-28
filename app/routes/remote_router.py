@@ -26,8 +26,9 @@ def proxy_maven(groupId: str, artifactId: str, version: str, name: str, request:
     url = f"{settings.url}/{groupId}/{artifactId}/{version}/{name}"
     logger.info(f"Proxying request: {request.method} {url}")
     resource = CacheService.getResource(groupId, artifactId, version, name)
-    if url.endswith("maven-metadata.xml"):
-        raise HTTPException(status_code=404, detail="Resource not found")
+    # ?
+    # if url.endswith("maven-metadata.xml"):
+    #     raise HTTPException(status_code=404, detail="Resource not found")
     # should be removed when local repository added
     if resource is None: #and not url.endswith("maven-metadata.xml"):
         resource = RemoteClientService.getResource(url, request)
