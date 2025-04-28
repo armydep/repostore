@@ -148,3 +148,8 @@ mvn dependency:resolve
 ```bash
 mvn deploy
 ```
+
+10. **TODO**
+- In case of HEAD request return only headers. for both cacheservice and remote service
+- Check if better to store headers as well in separated file
+- 
