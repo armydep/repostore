@@ -6,6 +6,8 @@ from fastapi import FastAPI
 from app.core.config import settings
 from app.core.logger import setup_logging
 from app.routes.remote_router import router as remote_router
+from app.routes.local_router import router as local_router
+from app.routes.virtual_router import router as virtual_router
 
 
 @asynccontextmanager
@@ -17,6 +19,10 @@ async def lifespan(app: FastAPI):
     yield
     print("🛑 App shutting down.")
 
+
 app = FastAPI(lifespan=lifespan)
 
+
 app.include_router(remote_router)
+app.include_router(local_router)
+app.include_router(virtual_router)
