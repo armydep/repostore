@@ -6,7 +6,7 @@ from app.services.repo_service import RepoService
 
 router = APIRouter(prefix="/virtual", tags=["Virtual API"])
 
-logger = logging.getLogger("proxy_service")
+logger = logging.getLogger("virtual_router")
 
 
 @router.put("/{repoName}/{groupId:path}/{artifactId}/{version}/{name}")
@@ -28,7 +28,16 @@ def maven_virtual_get(repoName: str, groupId: str, artifactId: str, version: str
         raise HTTPException(status_code=404, detail="Repository not found")
     url = f"{settings.url}/{groupId}/{artifactId}/{version}/{name}"
     # logger.info(f"Proxying request: {request.method} {url}")
-    resource = CacheService.getResource("maven-local", groupId, artifactId, version, name)
+    """
+    for local_repo in RepoService.get_local_repos():
+        resource = local_repo.get_resource(groupId, artifactId, version, name)
+        if resource is not None:
+            break
+
     if resource is None:
-        raise HTTPException(status_code=404, detail="Resource not found")
-    return resource
+        for local_repo in RepoService.get_local_repos():
+            resource = local_repo.get_resource(groupId, artifactId, version, name)
+            if resource is not None:
+                break
+    """
+    return ""

@@ -145,8 +145,13 @@ mvn dependency:resolve
   mvn package
   ```
 9. **Deploy package**
+- deploy
 ```bash
 mvn deploy
+```
+- curl
+```bash
+curl -X PUT "http://localhost:8000/repostore/maven-local/com/test/dummy/dummy-artifact/1.0.4/dummy-artifact-1.0.4.jar"      -H "Content-Type: application/java-archive"      --data-binary target/dummy-artifact-1.0.4.jar
 ```
 
 10. **TODO**
