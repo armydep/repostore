@@ -14,6 +14,8 @@ logger = logging.getLogger("remote_router")
 @router.api_route("/{repoName}/{groupId:path}/{artifactId}/{version}/{name}", methods=["GET", "HEAD"])
 def maven_remote(repoName: str, groupId: str, artifactId: str, version: str, name: str, request: Request):
     resource = RemoteRepoService.getRemoteResource(repoName, groupId, artifactId, version, name, request)
+    if resource.status_code != 200:
+        raise HTTPException(status_code=404, detail="Resource not found")
     return resource
 
 
@@ -21,4 +23,6 @@ def maven_remote(repoName: str, groupId: str, artifactId: str, version: str, nam
 @router.api_route("/{repoName}/{name}", methods=["GET", "HEAD"])
 def maven_remote_get_catalog(repoName: str, name: str, request: Request):
     resource = RemoteRepoService.getRemoteCatalog(repoName, name, request)
+    if resource.status_code != 200:
+        raise HTTPException(status_code=404, detail="Resource not found")
     return resource

@@ -1,43 +1,30 @@
 import logging
-from fastapi import APIRouter, Request, Response, HTTPException
+from fastapi import APIRouter, Request
 from app.core.config import settings
-from app.services.cache_service import CacheService
-from app.services.repo_service import RepoService
+from app.services.virtual_repo_service import VirtualRepoService
 
 router = APIRouter(prefix="/virtual", tags=["Virtual API"])
 
 logger = logging.getLogger("virtual_router")
 
 
-@router.put("/{repoName}/{groupId:path}/{artifactId}/{version}/{name}")
-async def maven_virtual_deploy(repoName: str, groupId: str, artifactId: str, version: str, name: str, request: Request):
-    if not RepoService.is_allowed(repoName):
-        logger.warning(f"Forbidden repoName access attempt: {repoName}")
-        raise HTTPException(status_code=404, detail="Repository not found")
-    # logger.info(f"Deploying resource: {groupId}/{artifactId}/{version}/{name}")
-    content = await request.body()
-    resource = Response(content=content, headers={})
-    CacheService.put("maven-local", groupId, artifactId, version, name, resource)
-    return {"message": "Resource deployed successfully."}
-
-
 @router.api_route("/{repoName}/{groupId:path}/{artifactId}/{version}/{name}", methods=["GET", "HEAD"])
-def maven_virtual_get(repoName: str, groupId: str, artifactId: str, version: str, name: str, request: Request):
-    if not RepoService.is_allowed(repoName):
-        logger.warning(f"Forbidden repoName access attempt: {repoName}")
-        raise HTTPException(status_code=404, detail="Repository not found")
-    url = f"{settings.url}/{groupId}/{artifactId}/{version}/{name}"
-    # logger.info(f"Proxying request: {request.method} {url}")
-    """
-    for local_repo in RepoService.get_local_repos():
-        resource = local_repo.get_resource(groupId, artifactId, version, name)
-        if resource is not None:
-            break
+def get_resource(repoName: str, groupId: str, artifactId: str, version: str, name: str, request: Request):
+    logger.info("get resource")
+    resource = VirtualRepoService.getVirtualResource(repoName, groupId, artifactId, version, name, request)
+    return resource
 
-    if resource is None:
-        for local_repo in RepoService.get_local_repos():
-            resource = local_repo.get_resource(groupId, artifactId, version, name)
-            if resource is not None:
-                break
-    """
-    return ""
+
+# archetype-catalog.xml. mvn generate package
+@router.api_route("/{repoName}/{name}", methods=["GET", "HEAD"])
+def get_catalog(repoName: str, name: str, request: Request):
+    resource = VirtualRepoService.getVirtualRemoteCatalog(repoName, name, request)
+    return resource
+
+
+@router.put("/{repoName}/{groupId:path}/{artifactId}/{version}/{name}")
+async def deploy(repoName: str, groupId: str, artifactId: str, version: str, name: str, request: Request):
+    logger.info("deploy request")
+    response = await VirtualRepoService.deployResource(repoName, groupId, artifactId, version, name, request)
+    return response
+

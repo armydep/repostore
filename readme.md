@@ -157,4 +157,7 @@ curl -X PUT "http://localhost:8000/repostore/maven-local/com/test/dummy/dummy-ar
 10. **TODO**
 - In case of HEAD request return only headers. for both cacheservice and remote service
 - Check if better to store headers as well in separated file
-- 
+- bug: returning 200 for Head request when actually not found returned by the remote
+  ```bash
+  curl http://localhost:8000/virtual/maven-virtual-1/org/apache/logging/log4j/log4j-core/2.999.0/log4j-core-2.999.0.pom
+  ```

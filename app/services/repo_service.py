@@ -14,3 +14,16 @@ class RepoService:
     @classmethod
     def is_exist_virtual(cls, repo_name: str) -> bool:
         return repo_name in cls._virtual_repos
+
+    # ------------- virtual -----------
+    @classmethod
+    def get_virtual_local_repos(cls, repo_name: str) -> list[str]:
+        return ["maven-local-1"]
+
+    @classmethod
+    def get_virtual_remote_repos(cls, repo_name: str) -> list[str]:
+        return ["maven-remote-1"]
+
+    @classmethod
+    def get_virtual_default_local_repo(cls, repo_name: str) -> str:
+        return "maven-local-1"

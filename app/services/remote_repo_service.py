@@ -1,4 +1,3 @@
-from typing import Optional, Tuple
 from fastapi import Request, Response, HTTPException
 from app.services.repo_service import RepoService
 from app.core.config import settings
@@ -15,9 +14,7 @@ class RemoteRepoService:
     # _virtual_repos = {"maven-virtual-1"}
 
     @classmethod
-    def getRemoteResource(
-        cls, repoName: str, groupId: str, artifactId: str, version: str, name: str, request: Request
-    ) -> Response:
+    def getRemoteResource(cls, repoName, groupId, artifactId, version, name, request: Request) -> Response:
         if not RepoService.is_exist_remote(repoName):
             raise HTTPException(status_code=404, detail="Repository not found")
         url = f"{settings.url}/{groupId}/{artifactId}/{version}/{name}"
